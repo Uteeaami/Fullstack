@@ -1,31 +1,89 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas',
-      phone: '040-12312334' }
-  ]) 
-  const [newName, setNewName] = useState('')
-  const [newNumber, setNewNumber] = useState('')
+const Persons = ({persons, searchName}) => {
+  return(
+    <div>
+      <ul>
+      {persons.filter(person=>person.name.toLowerCase().includes(searchName))
+      .map(person => <li>{person.name} {person.number}</li>)}
+      </ul>
+    </div>
+  )
+}
 
+const PersonForm = (props) =>{
 
   const addPerson = (event) => {
     event.preventDefault()
     const nameObject = {
-      name: newName,
-      phone: newNumber,
+      name: props.newName,
+      number: props.newNumber,
     }
-
-    persons.forEach((listed) => {
-      if(newName === listed.name){
-        alert(`${newName} is already added to phonebook`)
-      }
-      else{
-        setPersons(persons.concat(nameObject))
-        setNewName('')
-        setNewNumber('')
+    
+    const checkDupe = props.persons.some((value)=>{
+      if(value.name.toLowerCase() === nameObject.name.toLowerCase()){
+        alert(`${props.newName} is already added to phonebook`)
+          props.setNewName('')
+          return true;
+      }else{
+        return false
       }
     })
+
+    if(!checkDupe){
+      props.setPersons(props.persons.concat(nameObject))
+      props.setNewName('')
+      props.setNewNumber('')
+    }
+
+  }
+  return(
+    <form onSubmit={addPerson}>
+        <div>
+          name: <input
+          onChange ={props.handleNameChange}
+          value1 = {props.newName}
+          />
+        </div>
+        <div>
+          number: <input
+          onChange ={props.handleNumberChange}
+          value1 = {props.newNumber}
+          />
+        </div>
+        <div>
+          <button type="submit">add</button>
+        </div>
+      </form>
+  )
+}
+
+const Filter = ({handleSearchChange, searchName}) => {
+  return(
+    <div>
+      Search for a person: 
+      <input
+      onChange={handleSearchChange}
+      value={searchName}
+      />
+    </div>
+  )
+}
+
+const App = () => {
+  const [persons, setPersons] = useState([
+    { name: 'Arto Hellas', number: '040-123456' },
+    { name: 'Ada Lovelace', number: '39-44-5323523' },
+    { name: 'Dan Abramov', number: '12-43-234345' },
+    { name: 'Mary Poppendieck', number: '39-23-6423122' }
+  ])
+  const [newName, setNewName] = useState('')
+  const [newNumber, setNewNumber] = useState('')
+  const [searchName, setSearchName] = useState('')
+ 
+
+  const handleSearchChange = (event) => {
+    setSearchName(event.target.value)
   }
 
   const handleNameChange = (event) => {
@@ -42,28 +100,14 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <form onSubmit={addPerson}>
-        <div>
-          name: <input 
-          value = {newName}
-          onChange={handleNameChange}
-          />
-        </div>
-        <div>
-          number: <input
-          value = {newNumber}
-          onChange={handleNumberChange}
-          />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+        <Filter handleSearchChange={handleSearchChange} searchName={searchName}/>
+      <h2>Add a new</h2>
+        <PersonForm newName={newName} newNumber={newNumber} persons={persons} setPersons={setPersons} setNewName={setNewName} setNewNumber={setNewNumber}
+          handleNameChange={handleNameChange} handleNumberChange={handleNumberChange}
+        />
       <h2>Numbers</h2>
-      <ul>
-        {persons.map(person => <li>{person.name} {person.phone}</li>)}
-      </ul>
-    </div>
+        <Persons persons={persons} searchName={searchName}/>
+      </div>
   )
 
 }
