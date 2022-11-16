@@ -1,86 +1,81 @@
 import { useEffect, useState } from 'react'
 
-const Persons = ({persons, searchName}) => {
-  return(
-    <div>
-      <ul>
-      {persons.filter(person=>person.name.toLowerCase().includes(searchName))
-      .map(person => <li>{person.name} {person.number}</li>)}
-      </ul>
-    </div>
-  )
-}
-
-const PersonForm = (props) =>{
-
-  const addPerson = (event) => {
-    event.preventDefault()
-    const nameObject = {
-      name: props.newName,
-      number: props.newNumber,
-    }
-    
-    const checkDupe = props.persons.some((value)=>{
-      if(value.name.toLowerCase() === nameObject.name.toLowerCase()){
-        alert(`${props.newName} is already added to phonebook`)
-          props.setNewName('')
-          return true;
-      }else{
-        return false
-      }
-    })
-
-    if(!checkDupe){
-      props.setPersons(props.persons.concat(nameObject))
-      props.setNewName('')
-      props.setNewNumber('')
-    }
-
-  }
-  return(
-    <form onSubmit={addPerson}>
-        <div>
-          name: <input
-          onChange ={props.handleNameChange}
-          value1 = {props.newName}
-          />
-        </div>
-        <div>
-          number: <input
-          onChange ={props.handleNumberChange}
-          value1 = {props.newNumber}
-          />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
-  )
-}
-
-const Filter = ({handleSearchChange, searchName}) => {
-  return(
-    <div>
-      Search for a person: 
-      <input
-      onChange={handleSearchChange}
-      value={searchName}
-      />
-    </div>
-  )
-}
+import personService from './services/person'
+import Person from './components/Persons'
+import Filter from './components/Filter'
+import PersonForm from './components/PersonForm'
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456' },
-    { name: 'Ada Lovelace', number: '39-44-5323523' },
-    { name: 'Dan Abramov', number: '12-43-234345' },
-    { name: 'Mary Poppendieck', number: '39-23-6423122' }
-  ])
+  const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [searchName, setSearchName] = useState('')
  
+ useEffect(() => {
+  personService
+    .getAll()
+    .then(initialPersons => {
+      setPersons(initialPersons)
+    })
+ }, [])
+
+ const addPerson = (event) => {
+  event.preventDefault()
+  const personObject = {
+    name: newName,
+    number: newNumber,
+  }
+  
+  
+  const checkDupe = persons.some(value=>{
+    if(value.name.toLowerCase() === personObject.name.toLowerCase()){
+      if(window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)){
+        const personAdd = persons.find(person => person.name === personObject.name)
+        const pId = personAdd.id
+      
+        personService
+          .update(pId,personObject)
+          .then(updatedPerson => {
+            setPersons(persons.map(person => person.id !== personAdd.id ? person : updatedPerson))
+            setNewName('')
+            setNewNumber('')
+          })
+        return true
+      }else{
+          setNewName('')
+          setNewNumber('')
+          return true;
+      }
+    }else{
+      return false
+    }
+  })
+
+  if(!checkDupe){
+    personService
+      .create(personObject)
+      .then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson))
+        setNewName('')
+        setNewNumber('')
+      })
+  }
+
+}
+
+const handleRemoveClick = (id) => {
+  console.log(`Button ${id} Clicked`)
+  const person = persons.find(person => person.id === id)
+  const pname = person.name
+  const pId = person.id
+  
+  if(window.confirm(`Delete ${pname}?`)){
+    personService
+      .remove(id)
+    console.log(`${pname} deleted`)
+    setPersons(persons.filter(person => person.id !== pId))
+  }
+}
 
   const handleSearchChange = (event) => {
     setSearchName(event.target.value)
@@ -100,14 +95,24 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-        <Filter handleSearchChange={handleSearchChange} searchName={searchName}/>
+        <Filter 
+          handleSearchChange={handleSearchChange} 
+          searchName={searchName}/>
       <h2>Add a new</h2>
-        <PersonForm newName={newName} newNumber={newNumber} persons={persons} setPersons={setPersons} setNewName={setNewName} setNewNumber={setNewNumber}
-          handleNameChange={handleNameChange} handleNumberChange={handleNumberChange}
+        <PersonForm 
+          addPerson={addPerson} 
+          newName={newName} 
+          newNumber={newNumber}
+          handleNameChange={handleNameChange} 
+          handleNumberChange={handleNumberChange}
         />
       <h2>Numbers</h2>
-        <Persons persons={persons} searchName={searchName}/>
-      </div>
+          <Person
+              persons={persons}
+              searchName={searchName}
+              handleClick = {handleRemoveClick}
+            />
+    </div>
   )
 
 }

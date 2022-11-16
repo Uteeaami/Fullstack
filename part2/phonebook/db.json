@@ -1,0 +1,19 @@
+{
+  "persons": [
+    {
+      "name": "Arto Hellas",
+      "number": "040-123-555",
+      "id": 1
+    },
+    {
+      "name": "Karto Pellas",
+      "number": "123-444-6566",
+      "id": 2
+    },
+    {
+      "name": "Parto Kollas",
+      "number": "123-555-6666",
+      "id": 3
+    }
+  ]
+}
