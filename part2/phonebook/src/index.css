@@ -1,0 +1,64 @@
+
+.notify{
+    color: green;
+    background: lightgrey;
+    font-size: 20px;
+    border-style: solid;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.info{
+    color: rgb(0, 0, 0);
+    padding-top: 5px;
+    font-size: 20px;
+}
+
+ul{
+    list-style-type: square;
+}
+
+.add{
+    font-size: 12px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    border-radius: 5px;
+    font-weight: bold;
+    background-color: lightgreen;
+}
+
+.delete{
+    margin: 0;
+    margin-left: 10px;
+    margin-top: 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-size: 12px;
+    font-weight: bold;
+    background-color: 	crimson;
+    border-radius: 5px;
+
+
+}
+
+.delete:hover{
+    background-color: 	darkred;
+    cursor: pointer;
+}
+
+.upperbox{
+    margin: 0;
+    margin-left: 16px;
+    margin-block: 5px;
+}
+
+.lowerbox{
+    margin-block: 5px;
+}
+
+input{
+    margin-left: 2px;
+    border-width: 1px;
+    border-radius: 5px;
+}

@@ -3,13 +3,16 @@ import { useEffect, useState } from 'react'
 import personService from './services/person'
 import Person from './components/Persons'
 import Filter from './components/Filter'
+import Notification from './components/Notification'
 import PersonForm from './components/PersonForm'
+
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [searchName, setSearchName] = useState('')
+  const [notification, setNotification] = useState(null)
  
  useEffect(() => {
   personService
@@ -39,7 +42,13 @@ const App = () => {
             setPersons(persons.map(person => person.id !== personAdd.id ? person : updatedPerson))
             setNewName('')
             setNewNumber('')
+
+            setNotification(`${newName} number was updated`)
+              setTimeout(() => {
+                setNotification(null)
+              }, 2500)
           })
+
         return true
       }else{
           setNewName('')
@@ -58,6 +67,10 @@ const App = () => {
         setPersons(persons.concat(returnedPerson))
         setNewName('')
         setNewNumber('')
+        setNotification(`${newName} was added`)
+            setTimeout(() => {
+              setNotification(null)
+            }, 2500)
       })
   }
 
@@ -74,6 +87,12 @@ const handleRemoveClick = (id) => {
       .remove(id)
     console.log(`${pname} deleted`)
     setPersons(persons.filter(person => person.id !== pId))
+
+    setNotification(`${pname} was deleted successfully`)
+      setTimeout(() => {
+        setNotification(null)
+      }, 2500)
+    
   }
 }
 
@@ -95,10 +114,11 @@ const handleRemoveClick = (id) => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <h2><Notification message={notification}/></h2>
         <Filter 
           handleSearchChange={handleSearchChange} 
           searchName={searchName}/>
-      <h2>Add a new</h2>
+      <h2>Add a new contact</h2>
         <PersonForm 
           addPerson={addPerson} 
           newName={newName} 

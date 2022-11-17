@@ -9,9 +9,9 @@ const Person = ({persons, searchName, handleClick}) => {
           person.name.toLowerCase().includes(searchName)
           )
           .map(person => 
-            <li key={person.id}>
-            {person.name} {person.number} 
-            <button 
+            <li className="info" key={person.id}>
+            {person.name} {person.number}
+            <button className="delete" 
               onClick={() => handleClick(person.id)}>
               delete
             </button> 
